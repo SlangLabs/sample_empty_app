@@ -1,3 +1,4 @@
+/** Note that this package name needs to be changed to suit your application ***/
 package in.slanglabs.sample_mock;
 
 import android.content.Context;
@@ -24,22 +25,38 @@ public class VoiceInterface {
     private static String api_key = "your_buddy_key";
     private static Context appContext;
 
-    // To initialize Slang in your application, simply call VoiceInterface.init(context)
+    /****************************************************************
+     * App specific logic goes here
+     ***************************************************************/
+    private static class MyActionHandler implements SlangIntentAction {
+        @Override
+        public Status action(SlangIntent slangIntent, SlangSession slangSession) {
+            // TODO: Insert the handler for the intents here
+            Toast
+                .makeText(
+                    appContext,
+                    "Intent detected - " + slangIntent.getName()),
+                    Toast.LENGTH_LONG)
+                .show(); 
+            return Status.SUCESSS;
+        }
+    }
+
+    /****************************************************************
+     * Standard boiler plate goes here.
+     ***************************************************************/
+    // To initialize Slang in your application, simply call
+    // VoiceInterface.init(context)
     public static void init(Context context) {
         appContext = context;
 
         try {
-            SlangBuddyOptions options = new SlangBuddyOptions.Builder()
-                .setContext(context)
-                .setBuddyId(app_id)
-                .setAPIKey(api_key)
-                .setListener(new BuddyListener(context))
-                .setIntentAction(new MyActionHandler())
-                .setRequestedLocales(SlangLocale.getSupportedLocales())
-                .setDefaultLocale(SlangLocale.LOCALE_ENGLISH_IN)
-                // change env to production when the buddy is published to production
-                .setEnvironment(SlangBuddy.Environment.STAGING)
-                .build();
+            SlangBuddyOptions options = new SlangBuddyOptions.Builder().setContext(context).setBuddyId(app_id)
+                    .setAPIKey(api_key).setListener(new BuddyListener(context)).setIntentAction(new MyActionHandler())
+                    .setRequestedLocales(SlangLocale.getSupportedLocales())
+                    .setDefaultLocale(SlangLocale.LOCALE_ENGLISH_IN)
+                    // change env to production when the buddy is published to production
+                    .setEnvironment(SlangBuddy.Environment.STAGING).build();
             SlangBuddy.initialize(options);
         } catch (SlangBuddyOptions.InvalidOptionException e) {
             e.printStackTrace();
@@ -74,7 +91,8 @@ public class VoiceInterface {
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(appContext, "Failed to initialise Slang:" + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(appContext, "Failed to initialise Slang:" + e.getMessage(), Toast.LENGTH_LONG)
+                            .show();
                 }
             }, 10);
         }
@@ -86,33 +104,24 @@ public class VoiceInterface {
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(appContext, "Locale Changed:" + newLocale.getDisplayName(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(appContext, "Locale Changed:" + newLocale.getDisplayName(), Toast.LENGTH_LONG)
+                            .show();
                 }
             }, 10);
         }
 
         @Override
         public void onLocaleChangeFailed(final Locale newLocale, final SlangBuddy.LocaleChangeError e) {
-            Log.d("BuddyListener",
-                "Locale(" + newLocale.getDisplayName() + ") Change Failed:" + e.getMessage());
+            Log.d("BuddyListener", "Locale(" + newLocale.getDisplayName() + ") Change Failed:" + e.getMessage());
 
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(appContext,
-                        "Locale(" + newLocale.getDisplayName() + ") Change Failed:" + e.getMessage(),
-                        Toast.LENGTH_LONG).show();
+                            "Locale(" + newLocale.getDisplayName() + ") Change Failed:" + e.getMessage(),
+                            Toast.LENGTH_LONG).show();
                 }
             }, 10);
-        }
-    }
-
-    private static class MyActionHandler implements SlangIntentAction {
-
-        @Override
-        public Status action(SlangIntent slangIntent, SlangSession slangSession) {
-            // Insert the handler for the intents here
-            return null;
         }
     }
 }
